@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, Query, Request
 import uvicorn
 
 from app.models.models import InvokeRequest, InvokeResponse
+from app.services.agent_service import ensure_agent
+from app.services.whatsapp_service import extract_whatsapp_message
 
 
 app = FastAPI(
