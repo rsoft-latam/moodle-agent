@@ -3,6 +3,9 @@ from typing import Any, Optional
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
 
+from app.config import OPENAI_API_KEY, OPENAI_MODEL
+from app.tools.moodle_tools import moodle_calendar_upcoming, moodle_call_raw, moodle_course_assigments, moodle_site_info, moodle_user_courses, moodle_user_grades_by_courses, relogin
+
 
 MOODLE_TOOLS = [
     moodle_site_info,

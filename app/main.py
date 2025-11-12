@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Query, Request
 import uvicorn
 
+from app.config import WHATSAPP_VERIFY_TOKEN
 from app.models.models import InvokeRequest, InvokeResponse
 from app.services.agent_service import ensure_agent
-from app.services.whatsapp_service import extract_whatsapp_message
+from app.services.whatsapp_service import extract_whatsapp_message, send_whatsapp_message
 
 
 app = FastAPI(
@@ -36,7 +37,7 @@ def whatsapp_verify(
     hub_challenge:str = Query(None, alias='hub.challenge'),
     hub_verify_token:str = Query(None, alias='hub.verify_token')
 ):
-    if hub_mode == 'suscribe' and hub_verify_token == WHATSAPP_VERIFY_TOKEN
+    if hub_mode == 'suscribe' and hub_verify_token == WHATSAPP_VERIFY_TOKEN:
         return    int(hub_challenge) if(hub_challenge and hub_challenge.isdigit()) else hub_challenge or ''
     raise HTTPException(status_code=403, detail='verification_failed')
 

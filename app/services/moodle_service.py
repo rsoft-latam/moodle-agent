@@ -1,5 +1,15 @@
 import requests
 
+from app.config import MOODLE_BASE_URL, MOODLE_PASSWORD, MOODLE_SERVICE, MOODLE_USERNAME
+
+def force_relogin()->str:
+    return 'tets'
+
+def moodle_call(ws_function:str, **body):
+    token = _login()
+    data = _moodle_call_ws(ws_function,token, body)
+    return data
+
 def _login(): 
     url = (
         f"{MOODLE_BASE_URL}/login/token.php"
@@ -28,9 +38,4 @@ def _moodle_call_ws(ws_function:str, token:str, **body):
         return {
             'exception': 'request fail',
             'message': str(e)
-        }
-    
-def moodle_call(ws_function:str, **body):
-    token = _login()
-    data = _moodle_call_ws(ws_function,token, body)
-    return data
+        }    

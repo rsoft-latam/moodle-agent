@@ -1,6 +1,8 @@
 from typing import Any, Dict, Optional
 import requests
 
+from app.config import WHATSAPP_TOKEN
+
 def extract_whatsapp_message(payload: Dict[str, Any]):
     text = from_phone = message_id = business_phone_id = None
 
