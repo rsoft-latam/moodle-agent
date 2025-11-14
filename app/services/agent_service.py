@@ -4,17 +4,17 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
 
 from app.config import OPENAI_API_KEY, OPENAI_MODEL
-from app.tools.moodle_tools import moodle_calendar_upcoming, moodle_call_raw, moodle_course_assigments, moodle_site_info, moodle_user_courses, moodle_user_grades_by_courses, relogin
+from app.tools.moodle_tools import moodle_calendar_upcoming, moodle_call_raw, moodle_course_assigments, moodle_site_info, moodle_user_courses, moodle_user_grades_by_courses, moodle_force_login
 
 
 MOODLE_TOOLS = [
+    moodle_force_login,
     moodle_site_info,
     moodle_user_courses,
     moodle_course_assigments,
     moodle_user_grades_by_courses,
     moodle_calendar_upcoming,
-    moodle_call_raw,
-    relogin
+    moodle_call_raw
 ]
 
 SYSTEM_PROMP = """Eres un asistente academico integrado con moodle
@@ -26,7 +26,7 @@ Reglas:
 - Para calificaciones: moodle_user_grades_by_courses
 - Para eventos proximos: moodle_calendar_upcoming
 - Para cualquier otra funcion dosponible: moodle_call_raw
-- Si alguna llamada devuelve 'invalidtoken' el sistema reintenta automaticamente con relogin
+- Si alguna llamada devuelve 'invalidtoken' el sistema reintenta automaticamente con moodle_force_login
 Response en español, claro y consiso
 """
 
