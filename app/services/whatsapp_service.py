@@ -4,7 +4,7 @@ import requests
 from app.config import WHATSAPP_PHONE_ID, WHATSAPP_TOKEN
 
 
-def extract_whatsapp_message(payload: Dict[str, Any]):
+def extract_whatsapp_message(payload: Dict[str, Any]) -> Dict[str, Optional[str]]:
     """
     Extract key fields from the WhatsApp Cloud payload:
     text, from_phone, message_id, business_phone_id
@@ -19,7 +19,7 @@ def extract_whatsapp_message(payload: Dict[str, Any]):
         messages = value.get("messages", [])
         metadata = value.get("metadata", {})
 
-        business_phone_id = metadata.get("phone_numer_id") or None
+        business_phone_id = metadata.get("phone_number_id") or None
 
         if messages:
             m = messages[0]
@@ -45,12 +45,12 @@ def send_whatsapp_message(
     if not WHATSAPP_TOKEN:
         return {"warning": "WHATSAPP_TOKEN not configured"}
 
-    targed_id = business_phone_id
+    target_id = business_phone_id or WHATSAPP_PHONE_ID
 
-    if not targed_id:
+    if not target_id:
         return {"warning": "there is not phone number id"}
 
-    url = f"https://graph.facebook.com/v18.0/{targed_id}/messages"
+    url = f"https://graph.facebook.com/v18.0/{target_id}/messages"
     headers = {
         "Authorization": f"Bearer {WHATSAPP_TOKEN}",
         "Content-Type": "application/json",
@@ -59,7 +59,7 @@ def send_whatsapp_message(
         "messaging_product": "whatsapp",
         "to": to_phone,
         "type": "text",
-        "text": {"body": (text or "")},
+        "text": {"body": (text or "")[:4096]},
     }
 
     if message_id:
