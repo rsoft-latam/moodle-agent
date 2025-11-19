@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query, Request
+from mangum import Mangum
 import uvicorn
 
 from app.config import WHATSAPP_VERIFY_TOKEN
@@ -77,5 +78,9 @@ async def whatsapp_webhook(req: Request):
 
     return { 'status': 'ok', 'agent_answer': out, 'send_result': send_res }
 
+# === Lambda adapter ===
+lambda_handler = Mangum(app)
+
+# === Local Dev ===
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=3000)
