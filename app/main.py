@@ -45,7 +45,7 @@ def whatsapp_verify(
     hub_challenge:str = Query(None, alias='hub.challenge'),
     hub_verify_token:str = Query(None, alias='hub.verify_token')
 ):
-    if hub_mode == 'suscribe' and hub_verify_token == WHATSAPP_VERIFY_TOKEN:
+    if hub_mode == 'subscribe' and hub_verify_token == WHATSAPP_VERIFY_TOKEN:
         return int(hub_challenge) if(hub_challenge and hub_challenge.isdigit()) else hub_challenge or ''
     raise HTTPException(status_code=403, detail='verification_failed')
 
