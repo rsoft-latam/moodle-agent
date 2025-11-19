@@ -4,7 +4,8 @@ import uvicorn
 from app.config import WHATSAPP_VERIFY_TOKEN
 from app.models.models import InvokeRequest, InvokeResponse
 from app.services.agent_service import ensure_agent
-from app.services.whatsapp_service import extract_whatsapp_message, send_whatsapp_message
+from app.services.moodle_service import ensure_moodle_token
+from app.services.whatsapp_service import extract_whatsapp_message, send_whatsapp_message, whatsapp_mark_read
 
 
 app = FastAPI(
@@ -17,7 +18,13 @@ app = FastAPI(
 
 @app.get('/health')
 def health():
-    return {'ok': 'ok'}
+    ok = True
+    try:
+        ensure_moodle_token()
+        return { 'ok': ok }
+    except Exception:
+        ok = False
+        return { 'ok': ok }
 
 @app.post('/invoke', response_model=InvokeResponse)
 def invoke(req: InvokeRequest):
@@ -38,12 +45,16 @@ def whatsapp_verify(
     hub_verify_token:str = Query(None, alias='hub.verify_token')
 ):
     if hub_mode == 'suscribe' and hub_verify_token == WHATSAPP_VERIFY_TOKEN:
-        return    int(hub_challenge) if(hub_challenge and hub_challenge.isdigit()) else hub_challenge or ''
+        return int(hub_challenge) if(hub_challenge and hub_challenge.isdigit()) else hub_challenge or ''
     raise HTTPException(status_code=403, detail='verification_failed')
 
 @app.post('/webhook')
 async def whatsapp_webhook(req: Request):
-    payload = await req.json()
+    try:
+        payload = await req.json()
+    except Exception:
+        payload = {}
+        
     extracted = extract_whatsapp_message(payload)
     text = extracted['text']
     from_phone = extracted['from_phone']
@@ -61,9 +72,10 @@ async def whatsapp_webhook(req: Request):
 
     send_res = send_whatsapp_message(business_phone_id, from_phone, out, message_id)
 
+    if message_id:
+        _ = whatsapp_mark_read(business_phone_id, message_id)
+
     return { 'status': 'ok', 'agent_answer': out, 'send_result': send_res }
-
-
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=3000)

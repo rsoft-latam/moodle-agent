@@ -4,6 +4,7 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
 
 from app.config import OPENAI_API_KEY, OPENAI_MODEL
+from app.services.moodle_service import ensure_moodle_token
 from app.tools.moodle_tools import moodle_calendar_upcoming, moodle_call_raw, moodle_course_assigments, moodle_site_info, moodle_user_courses, moodle_user_grades_by_courses, moodle_force_login
 
 
@@ -55,5 +56,6 @@ AGENT: Optional[Any] = None
 def ensure_agent():
     global AGENT
     if AGENT is None:
+        ensure_moodle_token()
         AGENT = build_agent()
     return AGENT    
