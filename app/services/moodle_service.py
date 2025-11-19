@@ -15,6 +15,11 @@ def ensure_moodle_token() -> str:
     return _MOODLE_TOKEN    
 
 def moodle_call(ws_function:str, **body):
+    """
+    Moodle call wrapper that:
+    - Ensures a token (logs in if missing).
+    - If the WS responds with invalidtoken/accessexception, it forces a re-login and retries ONCE.
+    """
     token = ensure_moodle_token()
     data = _moodle_call_ws(ws_function,token, **body)
     return data
